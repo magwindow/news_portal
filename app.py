@@ -59,7 +59,13 @@ class Post(db.Model):
 @app.route('/index')
 def index():
     """Главная страница"""
-    return render_template('news/index.html', title='Главная')
+    posts = Post.query.all()
+    categories = Category.query.all()
+    return render_template('news/index.html',
+                           title='Главная',
+                           posts=posts,
+                           categories=categories
+                           )
 
 
 if __name__ == '__main__':

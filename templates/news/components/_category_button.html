@@ -1,0 +1,13 @@
+<ul class="nav nav-tabs">
+  {% for category in categories %}
+  {% if current == category %}
+  <li class="nav-item">
+    <a class="nav-link active" aria-current="page" href="#">{{ category }}</a>
+  </li>
+  {% else %}
+  <li class="nav-item">
+    <a class="nav-link" href="#">{{ category }}</a>
+  </li>
+  {% endif %}
+  {% endfor %}
+</ul>
