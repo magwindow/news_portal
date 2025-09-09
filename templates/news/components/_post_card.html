@@ -1,7 +1,11 @@
 {% for post in posts%}
 <div class="shadow col-sm-3 mb-sm-5 bg-white rounded">
 <div class="card" style="width: 18rem;">
+  {% if post.picture %}
+  <img src="{{ url_for('static', filename='images/' + post.picture) }}" height="200" class="card-img-top" alt="...">
+  {% else %}
   <img src="https://www.vector-eps.com/wp-content/gallery/newspaper-vector-icons/thumbs/thumbs_newspaper-vector-icons4.jpg" class="card-img-top" alt="...">
+  {% endif %}
   <div class="card-body">
     <h5 class="card-title">{{ post.title }}</h5>
     <p class="card-text">{{ post.content | truncate(50) }}</p>
