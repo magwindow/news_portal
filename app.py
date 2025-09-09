@@ -2,7 +2,7 @@ import os
 
 from dotenv import load_dotenv
 
-from flask import Flask, render_template, request, abort
+from flask import Flask, render_template, request, abort, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
 
 load_dotenv()
@@ -55,6 +55,16 @@ class Post(db.Model):
         return self.title
 
 
+# Forms
+from wtforms import Form, StringField, TextAreaField, SelectField
+
+
+class PostForm(Form):
+    title = StringField('Заголовок статьи:')
+    content = TextAreaField('Текст статьи:', render_kw={'rows': 15})
+    category = SelectField('Категория:', choices=[])
+
+
 @app.route('/')
 @app.route('/index')
 def index():
@@ -104,6 +114,27 @@ def search_result():
 @app.errorhandler(404)
 def page404(e):
     return render_template('news/404.html'), 404
+
+
+@app.route('/post/create', methods=['POST', 'GET'])
+def create_post():
+    if request.method == 'POST':
+        title = request.form['title']
+        content = request.form['content']
+        category = request.form['category']
+        category_id = Category.query.filter(Category.title == category).first().id
+
+        post = Post(title=title, content=content, category_id=category_id)
+        db.session.add(post)
+        db.session.commit()
+
+        return redirect(url_for('category_list', id=category_id))
+
+    categories = Category.query.all()
+    form = PostForm()
+    form.category.choices = [cat.title for cat in categories]
+
+    return render_template('news/create_post.html', form=form)
 
 
 if __name__ == '__main__':
