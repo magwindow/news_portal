@@ -2,7 +2,7 @@ import os
 
 from dotenv import load_dotenv
 
-from flask import Flask, render_template
+from flask import Flask, render_template, request
 from flask_sqlalchemy import SQLAlchemy
 
 load_dotenv()
@@ -85,6 +85,18 @@ def post_detail(id: int):
     """Статья на отдельной странице"""
     post = Post.query.filter(Post.id == id).first()
     return render_template('news/post_detail.html', post=post)
+
+
+@app.route('/search/', methods=['GET'])
+def search_result():
+    """Для поиска"""
+    q = request.args.get('q')
+    categories = Category.query.all()
+    search = Post.title.contains(q) | Post.content.contains(q)
+    posts = Post.query.filter(search).all()
+    return render_template('news/index.html',
+                           categories=categories,
+                           posts=posts)
 
 
 if __name__ == '__main__':
