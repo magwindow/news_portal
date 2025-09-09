@@ -61,7 +61,10 @@ def index():
     """Главная страница"""
     posts = Post.query.all()
     categories = Category.query.all()
-    return render_template('news/index.html', title='Главная', posts=posts, categories=categories)
+    return render_template('news/index.html',
+                           title='Главная',
+                           posts=posts,
+                           categories=categories)
 
 
 @app.route('/category/<int:id>')
@@ -70,8 +73,18 @@ def category_list(id: int):
     categories = Category.query.all()
     posts = Post.query.filter(Post.category_id == id)
     current = Category.query.get(id)
-    return render_template('news/index.html', title=current, categories=categories, posts=posts,
+    return render_template('news/index.html',
+                           title=current,
+                           categories=categories,
+                           posts=posts,
                            current=current)
+
+
+@app.route('/post/<int:id>')
+def post_detail(id: int):
+    """Статья на отдельной странице"""
+    post = Post.query.filter(Post.id == id).first()
+    return render_template('news/post_detail.html', post=post)
 
 
 if __name__ == '__main__':
