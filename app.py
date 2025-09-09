@@ -2,7 +2,7 @@ import os
 
 from dotenv import load_dotenv
 
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, abort
 from flask_sqlalchemy import SQLAlchemy
 
 load_dotenv()
@@ -94,9 +94,16 @@ def search_result():
     categories = Category.query.all()
     search = Post.title.contains(q) | Post.content.contains(q)
     posts = Post.query.filter(search).all()
+    if not posts:
+        abort(404)
     return render_template('news/index.html',
                            categories=categories,
                            posts=posts)
+
+
+@app.errorhandler(404)
+def page404(e):
+    return render_template('news/404.html'), 404
 
 
 if __name__ == '__main__':
