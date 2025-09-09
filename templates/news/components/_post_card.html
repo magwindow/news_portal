@@ -1,0 +1,13 @@
+{% for post in posts%}
+<div class="shadow col-sm-3 mb-sm-5 bg-white rounded">
+<div class="card" style="width: 18rem;">
+  <img src="https://www.vector-eps.com/wp-content/gallery/newspaper-vector-icons/thumbs/thumbs_newspaper-vector-icons4.jpg" class="card-img-top" alt="...">
+  <div class="card-body">
+    <h5 class="card-title">{{ post.title }}</h5>
+    <p class="card-text">{{ post.content | truncate(50) }}</p>
+    <a href="#" class="btn btn-primary">Подробнее</a>
+    <div><div style="margin-top: 20px;"></div> </div>
+  </div>
+</div>
+</div>
+{% endfor %}
