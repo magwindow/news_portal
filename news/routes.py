@@ -85,6 +85,43 @@ def create_post():
     return render_template('news/create_post.html', form=form)
 
 
+@app.route('/post/<int:id>/delete/')
+def delete_post(id: int):
+    """Удаление поста"""
+    post = Post.query.get(id)
+    category = post.category_id
+    db.session.delete(post)
+    db.session.commit()
+    return redirect(url_for('category_list', id=category))
+
+
+@app.route('/post/<int:id>/update/', methods=['POST', 'GET'])
+def update_post(id: int):
+    """Кнопка редактировать"""
+    post = Post.query.get(id)
+    categories = Category.query.all()
+    if request.method == 'POST':
+        category = request.form['category']
+        category_id = Category.query.filter(Category.title == category).first().id
+        post.category_id = category_id
+        post.title = request.form['title']
+        post.content = request.form['content']
+
+        if picture_file := request.files['picture']:
+            picture_name = secure_filename(picture_file.filename)
+            picture_name = str(uuid.uuid1()) + '_' + picture_name
+            picture_file.save(os.path.join(app.config['UPLOAD_FOLDER'], picture_name))
+            post.picture = picture_name
+
+        db.session.add(post)
+        db.session.commit()
+        return redirect(url_for('post_detail', id=id))
+
+    form = PostForm(obj=post)
+    form.category.choices = [cat.title for cat in categories]
+    return render_template('news/create_post.html', form=form, id=id)
+
+
 @app.errorhandler(404)
 def page404(e):
     return render_template('news/404.html'), 404
