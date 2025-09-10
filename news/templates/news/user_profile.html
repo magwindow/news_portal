@@ -12,16 +12,22 @@
                 <div class="card">
                     <div class="card-body">
                         <div class="d-flex flex-column align-items-center text-center">
+                            {% if user.photo %}
+                            <img src="{{ url_for('static', filename='images/' + user.photo) }}"
+                                 alt="Avatar" class="rounded-circle" width="150">
+                            {% else %}
                             <img src="https://www.pngall.com/wp-content/uploads/12/Avatar-Profile-PNG-Photos.png"
                                  alt="Admin" class="rounded-circle" width="150">
+                            {% endif %}
                             <div class="mt-3">
                                 <h4>{{ user.first_name }} {{user.last_name }}</h4>
                                 <p class="text-secondary mb-1">Python Developer</p>
                                 <p class="text-muted font-size-sm">Tashkent, Uzbekistan</p>
-                                <button class="btn btn-primary">Follow</button>
-                                <button class="btn btn-outline-primary">Message</button>
+                                <a href="{{ url_for('update_user', id=user.id) }}" class="btn btn-outline-secondary">Редактировать</a>
+                                <button class="btn btn-outline-danger">Удалить</button>
                             </div>
-                            <a href="#" class="dropdown-item">Изменить пароль</a>
+                            <hr>
+                            <a href="#" class="btn btn-outline-warning">Изменить пароль</a>
                         </div>
                     </div>
                 </div>
@@ -85,16 +91,43 @@
                     <div class="card-body">
                         <div class="row">
                             <div class="col-sm-3">
-                                <h6 class="mb-0">Full name</h6>
+                                <h6 class="mb-0">Логин</h6>
                             </div>
                             <div class="col-sm-9 text-secondary">
-                                {{ user.first_name }} {{user.last_name }}
+                                {{ user.username }}
                             </div>
                         </div>
                         <hr>
                         <div class="row">
                             <div class="col-sm-3">
-                                <h6 class="mb-0">Email</h6>
+                                <h6 class="mb-0">Имя</h6>
+                            </div>
+                            <div class="col-sm-9 text-secondary">
+                                {{ user.first_name }}
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="row">
+                            <div class="col-sm-3">
+                                <h6 class="mb-0">Фамилия</h6>
+                            </div>
+                            <div class="col-sm-9 text-secondary">
+                                {{ user.last_name }}
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="row">
+                            <div class="col-sm-3">
+                                <h6 class="mb-0">Контактный номер</h6>
+                            </div>
+                            <div class="col-sm-9 text-secondary">
+                                {{ user.phone }}
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="row">
+                            <div class="col-sm-3">
+                                <h6 class="mb-0">Почта</h6>
                             </div>
                             <div class="col-sm-9 text-secondary">
                                 {{ user.email }}
@@ -103,35 +136,10 @@
                         <hr>
                         <div class="row">
                             <div class="col-sm-3">
-                                <h6 class="mb-0">Phone</h6>
+                                <h6 class="mb-0">О себе</h6>
                             </div>
                             <div class="col-sm-9 text-secondary">
-                                {{ user.phone }}
-                            </div>
-                        </div>
-                        <hr>
-                        <div class="row">
-                            <div class="col-sm-3">
-                                <h6 class="mb-0">Mobile</h6>
-                            </div>
-                            <div class="col-sm-9 text-secondary">
-                                {{ user.phone }}
-                            </div>
-                        </div>
-                        <hr>
-                        <div class="row">
-                            <div class="col-sm-3">
-                                <h6 class="mb-0">Address</h6>
-                            </div>
-                            <div class="col-sm-9 text-secondary">
-                                Tashkent, Uzbekistan
-                            </div>
-                        </div>
-                        <hr>
-                        <div class="row">
-                            <div class="col-sm-12">
-                                <a class="btn btn-info " target="__blank"
-                                   href="https://www.bootdey.com/snippets/view/profile-edit-data-and-skills">Edit</a>
+                                {{ user.bio }}
                             </div>
                         </div>
                     </div>

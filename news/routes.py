@@ -2,7 +2,7 @@ import os
 import uuid
 
 from news import app, db
-from news.forms import PostForm, Registration, UserLogin
+from news.forms import PostForm, Registration, UserLogin, UpdateUserProfile
 from news.models import Post, Category, Users
 
 from werkzeug.utils import secure_filename
@@ -191,6 +191,39 @@ def user_profile(id: int):
     """Профиль пользователя"""
     user = Users.query.get(id)
     return render_template('news/user_profile.html', user=user)
+
+
+@app.route('/profile/<int:id>/update/', methods=['POST', 'GET'])
+@login_required
+def update_user(id: int):
+    """Редактирование профиля пользователя"""
+    user = Users.query.get(id)
+
+    if request.method == 'POST':
+        user.username = request.form['username']
+        user.first_name = request.form['first_name']
+        user.last_name = request.form['last_name']
+        user.phone = request.form['phone']
+        user.email = request.form['email']
+        user.bio = request.form['bio']
+
+        if picture_file := request.files['photo']:
+            picture_name = secure_filename(picture_file.filename)
+            picture_name = str(uuid.uuid1()) + '_' + picture_name
+            picture_file.save(os.path.join(app.config['UPLOAD_FOLDER'], picture_name))
+            user.photo = picture_name
+
+        try:
+            db.session.add(user)
+            db.session.commit()
+            flash('Отредактировано успешно')
+        except IntegrityError:
+            db.session.rollback()
+            flash('Пользователь с такими данными уже существует', 'error')
+
+    form = UpdateUserProfile(obj=user)
+    return render_template('news/edit_user_profile.html', form=form)
+
 
 
 @app.errorhandler(404)
