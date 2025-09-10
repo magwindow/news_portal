@@ -23,11 +23,14 @@
                                 <h4>{{ user.first_name }} {{user.last_name }}</h4>
                                 <p class="text-secondary mb-1">Python Developer</p>
                                 <p class="text-muted font-size-sm">Tashkent, Uzbekistan</p>
+                                {% if current_user|string == user.username %}
                                 <a href="{{ url_for('update_user', id=user.id) }}" class="btn btn-outline-secondary">Редактировать</a>
-                                <button class="btn btn-outline-danger">Удалить</button>
+                                <a href="{{ url_for('delete_user', id=user.id) }}" class="btn btn-outline-danger">Удалить</a>
+                                <hr>
+                                <a href="#" class="btn btn-outline-warning">Изменить пароль</a>
+                                {% endif %}
                             </div>
                             <hr>
-                            <a href="#" class="btn btn-outline-warning">Изменить пароль</a>
                         </div>
                     </div>
                 </div>

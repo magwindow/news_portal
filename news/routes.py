@@ -11,7 +11,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy.exc import IntegrityError
 
 from flask import render_template, request, abort, redirect, url_for, flash
-from flask_login import LoginManager, login_user, logout_user, login_required
+from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 
 # Flask login
 login_manager = LoginManager()
@@ -221,9 +221,26 @@ def update_user(id: int):
             db.session.rollback()
             flash('Пользователь с такими данными уже существует', 'error')
 
+    elif str(current_user) != user.username:
+        abort(404)
+
     form = UpdateUserProfile(obj=user)
     return render_template('news/edit_user_profile.html', form=form)
 
+
+@app.route('/profile/<int:id>/delete/')
+@login_required
+def delete_user(id: int):
+    """Удаление профиля"""
+    user = Users.query.get(id)
+
+    if str(current_user) != user.username:
+        abort(404)
+
+    db.session.delete(user)
+    db.session.commit()
+    flash('Аккаунт удален')
+    return redirect(url_for('index'))
 
 
 @app.errorhandler(404)
