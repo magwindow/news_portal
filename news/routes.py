@@ -2,11 +2,13 @@ import os
 import uuid
 
 from news import app, db
-from forms import PostForm
-from models import Post, Category
+from news.forms import PostForm, Registration
+from news.models import Post, Category, Users
 
 from werkzeug.utils import secure_filename
+from werkzeug.security import generate_password_hash
 
+from sqlalchemy.exc import IntegrityError
 from flask import render_template, request, abort, redirect, url_for
 
 
@@ -120,6 +122,28 @@ def update_post(id: int):
     form = PostForm(obj=post)
     form.category.choices = [cat.title for cat in categories]
     return render_template('news/create_post.html', form=form, id=id)
+
+
+@app.route('/registration', methods=['POST', 'GET'])
+def user_registration():
+    """Логика для регистрации"""
+    form = Registration(request.form)
+
+    if request.method == 'POST' and form.validate():
+        password_hash = generate_password_hash(form.password.data, method='scrypt')
+        user = Users(first_name=form.first_name.data,
+                     last_name=form.last_name.data,
+                     username=form.username.data,
+                     phone=form.phone.data,
+                     email=form.email.data,
+                     password=password_hash)
+        try:
+            db.session.add(user)
+            db.session.commit()
+        except IntegrityError:
+            db.session.rollback()
+
+    return render_template('news/user_registration.html', form=form)
 
 
 @app.errorhandler(404)
