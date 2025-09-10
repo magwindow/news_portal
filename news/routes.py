@@ -155,6 +155,7 @@ def delete_post(id: int):
     category = post.category_id
     db.session.delete(post)
     db.session.commit()
+    flash(f'Вы удалили пост {post.title}')
     return redirect(url_for('category_list', id=category))
 
 
@@ -183,6 +184,13 @@ def update_post(id: int):
     form = PostForm(obj=post)
     form.category.choices = [cat.title for cat in categories]
     return render_template('news/create_post.html', form=form, id=id)
+
+
+@app.route('/profile/<int:id>')
+def user_profile(id: int):
+    """Профиль пользователя"""
+    user = Users.query.get(id)
+    return render_template('news/user_profile.html', user=user)
 
 
 @app.errorhandler(404)
