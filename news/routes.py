@@ -10,8 +10,8 @@ from werkzeug.security import generate_password_hash, check_password_hash
 
 from sqlalchemy.exc import IntegrityError
 
-from flask import render_template, request, abort, redirect, url_for
-from flask_login import LoginManager, login_user, logout_user
+from flask import render_template, request, abort, redirect, url_for, flash
+from flask_login import LoginManager, login_user, logout_user, login_required
 
 # Flask login
 login_manager = LoginManager()
@@ -33,7 +33,10 @@ def user_login():
         user = Users.query.filter_by(username=form.username.data).first()
         if user and check_password_hash(user.password, form.password.data):
             login_user(user)
+            flash('Вы успешно вошли в систему')
             return redirect(url_for('index'))
+        else:
+            flash('Неправильный логин или пароль', 'error')
 
     return render_template('news/user_login.html', form=form)
 
@@ -60,8 +63,11 @@ def user_registration():
         try:
             db.session.add(user)
             db.session.commit()
+            flash('Аккаунт создан успешно, пожалуйста войдите')
+            return redirect(url_for('user_login'))
         except IntegrityError:
             db.session.rollback()
+            flash('Пользователь с такими данными уже существует', 'error')
 
     return render_template('news/user_registration.html', form=form)
 
@@ -113,6 +119,7 @@ def search_result():
 
 
 @app.route('/post/create', methods=['POST', 'GET'])
+@login_required
 def create_post():
     if request.method == 'POST':
         title = request.form['title']
