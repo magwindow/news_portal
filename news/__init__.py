@@ -17,3 +17,5 @@ migrate = Migrate(app, db)
 
 UPLOAD_FOLDER = 'static/images'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
+app.config['SECRET_KEY'] = 'Test Secret Key'

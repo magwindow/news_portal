@@ -19,3 +19,9 @@ class Registration(Form):
     password = PasswordField('Пароль *', [validators.Length(min=1, max=15),
                                           validators.EqualTo('confirm', message='Пароли должны совпадать')])
     confirm = PasswordField('Подтверждение пароля *', [validators.DataRequired()])
+
+
+class UserLogin(Form):
+    """Форма для авторизации пользователя"""
+    username = StringField('Логин')
+    password = PasswordField('Пароль')

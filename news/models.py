@@ -5,6 +5,8 @@ from news import db
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import mapped_column
 
+from flask_login import UserMixin
+
 
 class Category(db.Model):
     """Категории постов"""
@@ -32,7 +34,7 @@ class Post(db.Model):
         return self.title
 
 
-class Users(db.Model):
+class Users(db.Model, UserMixin):
     """Для профайла пользователя"""
     __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)

@@ -2,14 +2,68 @@ import os
 import uuid
 
 from news import app, db
-from news.forms import PostForm, Registration
+from news.forms import PostForm, Registration, UserLogin
 from news.models import Post, Category, Users
 
 from werkzeug.utils import secure_filename
-from werkzeug.security import generate_password_hash
+from werkzeug.security import generate_password_hash, check_password_hash
 
 from sqlalchemy.exc import IntegrityError
+
 from flask import render_template, request, abort, redirect, url_for
+from flask_login import LoginManager, login_user, logout_user
+
+# Flask login
+login_manager = LoginManager()
+login_manager.init_app(app)
+login_manager.login_view = 'user_login'
+
+
+@login_manager.user_loader
+def load_user(user_id):
+    """Чекер пользователя"""
+    return Users.query.get(int(user_id))
+
+
+@app.route('/login', methods=['POST', 'GET'])
+def user_login():
+    """Аутентификация пользователя"""
+    form = UserLogin(request.form)
+    if request.method == 'POST':
+        user = Users.query.filter_by(username=form.username.data).first()
+        if user and check_password_hash(user.password, form.password.data):
+            login_user(user)
+            return redirect(url_for('index'))
+
+    return render_template('news/user_login.html', form=form)
+
+
+@app.route('/logout', methods=['POST', 'GET'])
+def logout():
+    logout_user()
+    return redirect(url_for('index'))
+
+
+@app.route('/registration', methods=['POST', 'GET'])
+def user_registration():
+    """Логика для регистрации"""
+    form = Registration(request.form)
+
+    if request.method == 'POST' and form.validate():
+        password_hash = generate_password_hash(form.password.data, method='scrypt')
+        user = Users(first_name=form.first_name.data,
+                     last_name=form.last_name.data,
+                     username=form.username.data,
+                     phone=form.phone.data,
+                     email=form.email.data,
+                     password=password_hash)
+        try:
+            db.session.add(user)
+            db.session.commit()
+        except IntegrityError:
+            db.session.rollback()
+
+    return render_template('news/user_registration.html', form=form)
 
 
 @app.route('/')
@@ -122,28 +176,6 @@ def update_post(id: int):
     form = PostForm(obj=post)
     form.category.choices = [cat.title for cat in categories]
     return render_template('news/create_post.html', form=form, id=id)
-
-
-@app.route('/registration', methods=['POST', 'GET'])
-def user_registration():
-    """Логика для регистрации"""
-    form = Registration(request.form)
-
-    if request.method == 'POST' and form.validate():
-        password_hash = generate_password_hash(form.password.data, method='scrypt')
-        user = Users(first_name=form.first_name.data,
-                     last_name=form.last_name.data,
-                     username=form.username.data,
-                     phone=form.phone.data,
-                     email=form.email.data,
-                     password=password_hash)
-        try:
-            db.session.add(user)
-            db.session.commit()
-        except IntegrityError:
-            db.session.rollback()
-
-    return render_template('news/user_registration.html', form=form)
 
 
 @app.errorhandler(404)
