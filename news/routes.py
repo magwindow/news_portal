@@ -44,7 +44,8 @@ def user_login():
 @app.route('/logout', methods=['POST', 'GET'])
 def logout():
     logout_user()
-    return redirect(url_for('index'))
+    flash('Вы вышли из аккаунта')
+    return redirect(url_for('user_login'))
 
 
 @app.route('/registration', methods=['POST', 'GET'])
