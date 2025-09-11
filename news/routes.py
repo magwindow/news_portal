@@ -136,7 +136,8 @@ def create_post():
         post = Post(title=title,
                     content=content,
                     category_id=category_id,
-                    picture=picture_name)
+                    picture=picture_name,
+                    author=current_user)
         db.session.add(post)
         db.session.commit()
 
