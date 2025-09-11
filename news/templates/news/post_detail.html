@@ -24,6 +24,7 @@
         </div>
         <div class="card-footer text-muted">
             {{ post.created.strftime('%d.%m.%Y %H:%M:%S') }}
+            Автор: <a href="{{ url_for('user_profile', id=post.author.id) }}">{{ post.author }}</a>
         </div>
     </div>
 </div>
